@@ -3,90 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Locadora DW - Sistema de Gestão</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Locadora DB - Sistema de Gestão</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1 class="header-title">Locadora DW</h1>
-            <nav class="nav-tabs">
-                <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
-                <button class="tab-btn" onclick="switchTab('filmes')">Filmes</button>
-                <button class="tab-btn" onclick="switchTab('clientes')">Clientes</button>
-                <button class="tab-btn" onclick="switchTab('comentarios')">Comentários</button>
-                <button class="tab-btn" onclick="switchTab('relatorios')">Relatórios</button>
-            </nav>
-        </header>
-
-        <main>
-            <!-- Dashboard -->
-            <section id="dashboard" class="tab-content active">
-                <div class="dashboard-grid">
-                    <div class="kpi-card">
-                        <h3>Total de Clientes</h3>
-                        <div class="kpi-value" id="totalCustomers">150</div>
-                        <div class="kpi-change">+5% vs mês anterior</div>
+        <div class="header">
+            <h1>Locadora DB</h1>
+            <p>Sistema Integrado de Gestão de Filmes e Clientes</p>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+            <button class="tab-btn" onclick="switchTab('filmes')">Catálogo</button>
+            <button class="tab-btn" onclick="switchTab('clientes')">Clientes</button>
+            <button class="tab-btn" onclick="switchTab('comentarios')">Comentários</button>
+            <button class="tab-btn" onclick="switchTab('relatorios')">Relatórios</button>
+        </div>
+        
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="dashboard-grid">
+                <div class="kpi-card">
+                    <h3>Total de Clientes</h3>
+                    <div class="value" id="totalCustomers">-</div>
+                    <div class="change">-</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Filmes Disponíveis</h3>
+                    <div class="value" id="availableMovies">-</div>
+                    <div class="change">-</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Locações Ativas</h3>
+                    <div class="value" id="activeRentals">-</div>
+                    <div class="change">-</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Faturamento Mensal</h3>
+                    <div class="value" id="monthlyRevenue">-</div>
+                    <div class="change">-</div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Locações por Categoria (Últimos 6 Meses)</h3>
+                <canvas id="rentalsChart" width="400" height="200"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Top Filmes Mais Alugados</h3>
+                <canvas id="topMoviesChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+        
+        <!-- Filmes Tab -->
+        <div id="filmes" class="tab-content">
+            <div class="search-bar">
+                <input type="text" id="movieSearch" placeholder="Buscar filmes..." onkeyup="searchMovies()">
+                <button class="btn" onclick="searchMovies()">Buscar</button>
+            </div>
+            
+            <div class="filter-controls">
+                <select id="genreFilter" class="form-control" onchange="searchMovies()">
+                    <option value="">Todos os Gêneros</option>
+                    <option value="acao">Ação</option>
+                    <option value="comedia">Comédia</option>
+                    <option value="drama">Drama</option>
+                    <option value="ficcao">Ficção Científica</option>
+                </select>
+                <select id="availabilityFilter" class="form-control" onchange="searchMovies()">
+                    <option value="">Todos</option>
+                    <option value="available">Disponíveis</option>
+                    <option value="rented">Alugados</option>
+                </select>
+            </div>
+            
+            <div class="movies-grid" id="moviesGrid">
+                <!-- Movie cards will be inserted here via JavaScript -->
+            </div>
+            
+            <!-- Movie Card Template -->
+            <template id="movieCardTemplate">
+                <div class="movie-card">
+                    <img src="" alt="" class="movie-poster">
+                    <div class="movie-info">
+                        <h4 class="movie-title"></h4>
+                        <p class="movie-genre"></p>
+                        <p class="movie-year"></p>
+                        <div class="movie-actions">
+                            <button class="btn btn-primary rent-btn" onclick="rentMovie(this.dataset.id)">Alugar</button>
+                            <button class="btn btn-secondary details-btn" onclick="showMovieDetails(this.dataset.id)">Detalhes</button>
+                        </div>
                     </div>
-                    <div class="kpi-card">
-                        <h3>Filmes Disponíveis</h3>
-                        <div class="kpi-value" id="availableMovies">45</div>
-                        <div class="kpi-change">+2% vs mês anterior</div>
-                    </div>
-                    <div class="kpi-card">
-                        <h3>Locações Ativas</h3>
-                        <div class="kpi-value" id="activeRentals">23</div>
-                        <div class="kpi-change negative">-3% vs mês anterior</div>
-                    </div>
-                    <div class="kpi-card">
-                        <h3>Receita Mensal</h3>
-                        <div class="kpi-value" id="monthlyRevenue">R$ 12.450</div>
-                        <div class="kpi-change">+8% vs mês anterior</div>
-                    </div>
                 </div>
-
-                <div class="chart-container">
-                    <canvas id="rentalsChart"></canvas>
-                </div>
-
-                <div class="chart-container">
-                    <canvas id="topMoviesChart"></canvas>
-                </div>
-            </section>
-
-            <!-- Filmes -->
-            <section id="filmes" class="tab-content">
-                <div class="search-controls">
-                    <input type="text" id="movieSearch" class="search-input" placeholder="Buscar filmes...">
-                    <select id="genreFilter" class="filter-select">
-                        <option value="">Todos os gêneros</option>
-                        <option value="acao">Ação</option>
-                        <option value="comedia">Comédia</option>
-                        <option value="drama">Drama</option>
-                        <option value="ficcao">Ficção Científica</option>
-                        <option value="romance">Romance</option>
-                    </select>
-                    <select id="availabilityFilter" class="filter-select">
-                        <option value="">Todos</option>
-                        <option value="available">Disponíveis</option>
-                        <option value="unavailable">Indisponíveis</option>
-                    </select>
-                    <button class="btn" onclick="searchMovies()">Buscar</button>
-                </div>
-
-                <div id="moviesGrid" class="movies-grid">
-                    <!-- Filmes serão carregados dinamicamente -->
-                </div>
-            </section>
-
-            <!-- Clientes -->
-            <section id="clientes" class="tab-content">
-                <div class="search-controls">
-                    <input type="text" id="customerSearch" class="search-input" placeholder="Buscar clientes...">
-                    <button class="btn" onclick="searchCustomers()">Buscar</button>
-                </div>
-
+            </template>
+        </div>
+        
+        <!-- Clientes Tab -->
+        <div id="clientes" class="tab-content">
+            <div class="search-bar">
+                <input type="text" id="customerSearch" placeholder="Buscar clientes..." onkeyup="searchCustomers()">
+                <button class="btn" onclick="searchCustomers()">Buscar</button>
+            </div>
+            
+            <div class="table-container">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -98,86 +120,108 @@
                         </tr>
                     </thead>
                     <tbody id="customersTable">
-                        <!-- Clientes serão carregados dinamicamente -->
+                        <!-- Customer data will be inserted here via JavaScript -->
                     </tbody>
                 </table>
-            </section>
-
-            <!-- Comentários -->
-            <section id="comentarios" class="tab-content">
-                <div class="comments-section">
-                    <h2>Adicionar Comentário</h2>
-                    <form class="comment-form" onsubmit="event.preventDefault(); submitComment();">
-                        <select id="movieSelect" class="search-input" required>
-                            <option value="">Selecione um filme</option>
-                            <option value="Interestelar">Interestelar</option>
-                            <option value="O Poderoso Chefão">O Poderoso Chefão</option>
-                            <option value="Matrix">Matrix</option>
-                            <option value="Pulp Fiction">Pulp Fiction</option>
-                        </select>
-                        <textarea id="commentText" class="search-input" placeholder="Seu comentário..." required></textarea>
-                        <div class="rating-input">
-                            <label>Avaliação:</label>
-                            <div class="rating-stars">
-                                <input type="radio" name="rating" value="5" id="rating5" required>
-                                <label for="rating5">★</label>
-                                <input type="radio" name="rating" value="4" id="rating4">
-                                <label for="rating4">★</label>
-                                <input type="radio" name="rating" value="3" id="rating3">
-                                <label for="rating3">★</label>
-                                <input type="radio" name="rating" value="2" id="rating2">
-                                <label for="rating2">★</label>
-                                <input type="radio" name="rating" value="1" id="rating1">
-                                <label for="rating1">★</label>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn">Enviar Comentário</button>
-                    </form>
-
-                    <h2>Comentários Recentes</h2>
-                    <div id="commentsContainer">
-                        <!-- Comentários serão carregados dinamicamente -->
-                    </div>
+            </div>
+            
+            <!-- Customer Actions Template -->
+            <template id="customerActionsTemplate">
+                <div class="customer-actions">
+                    <button class="btn btn-sm btn-primary" onclick="editCustomer(this.dataset.id)">Editar</button>
+                    <button class="btn btn-sm btn-secondary" onclick="viewCustomerHistory(this.dataset.id)">Histórico</button>
                 </div>
-            </section>
-
-            <!-- Relatórios -->
-            <section id="relatorios" class="tab-content">
-                <div class="search-controls">
-                    <select id="reportPeriod" class="filter-select">
+            </template>
+        </div>
+        
+        <!-- Comentários Tab -->
+        <div id="comentarios" class="tab-content">
+            <div class="comments-section">
+                <h3>Comentários Recentes</h3>
+                <div class="comments-container" id="commentsContainer">
+                    <!-- Comments will be inserted here via JavaScript -->
+                </div>
+                
+                <div class="comment-form">
+                    <h4>Adicionar Comentário</h4>
+                    <div class="form-group">
+                        <label>Filme:</label>
+                        <select id="movieSelect" class="form-control">
+                            <!-- Movie options will be inserted here via JavaScript -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Comentário:</label>
+                        <textarea id="commentText" class="form-control" rows="4"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Avaliação:</label>
+                        <div class="rating-input">
+                            <input type="radio" id="star5" name="rating" value="5">
+                            <label for="star5">★</label>
+                            <input type="radio" id="star4" name="rating" value="4">
+                            <label for="star4">★</label>
+                            <input type="radio" id="star3" name="rating" value="3">
+                            <label for="star3">★</label>
+                            <input type="radio" id="star2" name="rating" value="2">
+                            <label for="star2">★</label>
+                            <input type="radio" id="star1" name="rating" value="1">
+                            <label for="star1">★</label>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="submitComment()">Enviar Comentário</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Relatórios Tab -->
+        <div id="relatorios" class="tab-content">
+            <div class="report-controls">
+                <div class="form-group">
+                    <label>Período:</label>
+                    <select id="reportPeriod" class="form-control" onchange="generateReport()">
                         <option value="week">Última Semana</option>
                         <option value="month">Último Mês</option>
+                        <option value="quarter">Último Trimestre</option>
                         <option value="year">Último Ano</option>
                     </select>
-                    <select id="reportType" class="filter-select">
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Relatório:</label>
+                    <select id="reportType" class="form-control" onchange="generateReport()">
                         <option value="rentals">Locações</option>
-                        <option value="revenue">Receita</option>
+                        <option value="revenue">Faturamento</option>
                         <option value="customers">Clientes</option>
+                        <option value="movies">Filmes</option>
                     </select>
-                    <button class="btn" onclick="generateReport()">Gerar Relatório</button>
                 </div>
-
-                <div class="chart-container">
-                    <canvas id="reportChart"></canvas>
-                </div>
-
+                <button class="btn" onclick="generateReport()">Gerar Relatório</button>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Relatório de Locações</h3>
+                <canvas id="reportChart" width="400" height="200"></canvas>
+            </div>
+            
+            <div class="data-section">
+                <h3>Dados Detalhados</h3>
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Data</th>
-                            <th>Descrição</th>
-                            <th>Valor</th>
-                            <th>Status</th>
+                            <th>Período</th>
+                            <th>Total Locações</th>
+                            <th>Faturamento</th>
+                            <th>Novos Clientes</th>
                         </tr>
                     </thead>
-                    <tbody id="reportTable">
-                        <!-- Dados do relatório serão carregados dinamicamente -->
+                    <tbody id="reportTableBody">
+                        <!-- Report data will be inserted here via JavaScript -->
                     </tbody>
                 </table>
-            </section>
-        </main>
+            </div>
+        </div>
     </div>
 
-    <script src="/js/main.js"></script>
+    <script src="app.js"></script>
 </body>
-</html> 
+</html>

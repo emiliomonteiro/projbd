@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import mongoService from '../services/mongodb.js';
+
 const router = express.Router();
-const mongoService = require('../services/mongodb');
 
 // Listar comentários de um filme
 router.get('/filme/:filmeId', async (req, res) => {
@@ -84,4 +85,4 @@ router.get('/filme/:filmeId/imagens', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import { oltpPool, dwPool } from '../services/postgre.js';
+
 const router = express.Router();
-const { oltp: oltpPool, dw: dwPool } = require('../services/postgre');
 
 // Listar todos os clientes
 router.get('/', async (req, res) => {
@@ -194,4 +195,4 @@ async function syncToDataWarehouse(cliente) {
     }
 }
 
-module.exports = router;
+export default router;

@@ -1,11 +1,12 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
-module.exports = {
+export const config = {
     // Server Configuration
     port: process.env.PORT || 3000,
     env: process.env.NODE_ENV || 'development',
 
-    // Database Configuration
+    // PostgreSQL Configuration
     postgres: {
         host: process.env.POSTGRES_HOST || 'localhost',
         port: process.env.POSTGRES_PORT || 5432,
@@ -14,6 +15,7 @@ module.exports = {
         password: process.env.POSTGRES_PASSWORD || 'postgres'
     },
 
+    // MongoDB Configuration
     mongodb: {
         uri: process.env.MONGODB_URI || 'mongodb://localhost:27017',
         database: process.env.MONGODB_DB || 'locadora_dw'

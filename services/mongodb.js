@@ -1,4 +1,4 @@
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
 
 const uri = 'mongodb://localhost:27017';
 const dbName = 'locadora_dw';
@@ -105,4 +105,4 @@ class MongoDBService {
     }
 }
 
-module.exports = new MongoDBService(); 
+export default new MongoDBService(); 

@@ -1,0 +1,215 @@
+/* Movie Card Styles */
+.movie-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.movie-card:hover {
+    transform: translateY(-5px);
+}
+
+.movie-poster {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+.movie-info {
+    padding: 15px;
+}
+
+.movie-title {
+    margin: 0 0 10px;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.movie-genre, .movie-year {
+    color: #666;
+    margin: 5px 0;
+}
+
+.movie-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background: #fff;
+    margin: 50px auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+/* Movie Details Styles */
+.movie-details {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 30px;
+}
+
+.movie-poster-large {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.movie-info-detailed {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.movie-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.stat {
+    background: #f5f5f5;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.stat .label {
+    display: block;
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+}
+
+.stat .value {
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+/* Customer History Styles */
+.customer-history {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.customer-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Customer Edit Form Styles */
+.customer-edit-form {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.customer-edit-form .form-group {
+    margin-bottom: 15px;
+}
+
+.customer-edit-form label {
+    display: block;
+    margin-bottom: 5px;
+    color: #666;
+}
+
+.customer-edit-form input,
+.customer-edit-form select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Button Styles */
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 0.9em;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .movie-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .movie-poster-large {
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    
+    .modal-content {
+        margin: 20px;
+        width: auto;
+    }
+} 

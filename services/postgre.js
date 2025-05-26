@@ -1,8 +1,8 @@
-const { Pool } = require('pg');
-const config = require('../config');
+import { Pool } from 'pg';
+import { config } from '../config.js';
 
 // OLTP Database Pool
-const oltpPool = new Pool({
+export const oltpPool = new Pool({
     user: config.postgres.user,
     host: config.postgres.host,
     database: 'locadora',
@@ -11,7 +11,7 @@ const oltpPool = new Pool({
 });
 
 // Data Warehouse Pool
-const dwPool = new Pool({
+export const dwPool = new Pool({
     user: config.postgres.user,
     host: config.postgres.host,
     database: 'locadora_dw',
@@ -20,7 +20,7 @@ const dwPool = new Pool({
 });
 
 // Test connections
-async function testConnections() {
+export async function testConnections() {
     try {
         await oltpPool.query('SELECT NOW()');
         await dwPool.query('SELECT NOW()');
@@ -33,8 +33,3 @@ async function testConnections() {
 
 // Initialize connections
 testConnections();
-
-module.exports = {
-    oltp: oltpPool,
-    dw: dwPool
-};
