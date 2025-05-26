@@ -5,10 +5,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Locadora de Filmes</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Locadora DW</div>
+            <ul class="nav-links">
+                <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="#clientes">Clientes</a></li>
+                <li><a href="#filmes">Filmes</a></li>
+                <li><a href="#comentarios">Comentários</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="dashboard" class="section">
+            <h2>Dashboard</h2>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Total de Clientes</h3>
+                    <p class="number">150</p>
+                </div>
+                <div class="card">
+                    <h3>Filmes Disponíveis</h3>
+                    <p class="number">45</p>
+                </div>
+                <div class="card">
+                    <h3>Locações Ativas</h3>
+                    <p class="number">23</p>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="rentalsChart"></canvas>
+            </div>
+        </section>
+
+        <section id="clientes" class="section">
+            <h2>Gerenciamento de Clientes</h2>
+            <div class="search-bar">
+                <input type="text" placeholder="Buscar cliente...">
+                <button>Buscar</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Telefone</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientesTable">
+                        <!-- Dados serão inseridos via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="filmes" class="section">
+            <h2>Catálogo de Filmes</h2>
+            <div class="movies-grid">
+                <!-- Cards de filmes serão inseridos via JavaScript -->
+            </div>
+        </section>
+
+        <section id="comentarios" class="section">
+            <h2>Comentários</h2>
+            <div class="comments-container">
+                <!-- Comentários serão inseridos via JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Locadora DW. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

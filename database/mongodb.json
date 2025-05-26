@@ -40,6 +40,47 @@
         "ano": 1972,
         "formatos": ["DVD", "Digital"]
       }
-    ]
+    ],
+    "collections": {
+      "comentarios": {
+        "schema": {
+          "cliente_id": "ObjectId",
+          "produto_id": "ObjectId",
+          "comentario": "String",
+          "avaliacao": "Number",
+          "data_comentario": "Date",
+          "imagens": ["String"],
+          "tags": ["String"],
+          "metadata": {
+            "tipo": "Object",
+            "properties": {
+              "plataforma": "String",
+              "versao_app": "String",
+              "dispositivo": "String"
+            }
+          }
+        }
+      },
+      "produto_imagens": {
+        "schema": {
+          "produto_id": "ObjectId",
+          "imagens": [{
+            "url": "String",
+            "tipo": "String",
+            "dimensoes": {
+              "largura": "Number",
+              "altura": "Number"
+            },
+            "metadata": {
+              "formato": "String",
+              "tamanho": "Number",
+              "data_upload": "Date"
+            }
+          }],
+          "capa_principal": "String",
+          "galeria": ["String"]
+        }
+      }
+    }
   }
   
