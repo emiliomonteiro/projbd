@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Análise de Dados de Varejo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .kpi-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 30px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .kpi-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .kpi-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .kpi-card .change {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+        
+        .data-section {
+            margin-bottom: 30px;
+        }
+        
+        .data-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .data-table th {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .data-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .analysis-results {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .mining-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .mining-card h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .cluster-item {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .prediction-item {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .temporal-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .temporal-controls input {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .integration-status {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .status-item {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .status-connected {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #2c3e50;
+        }
+        
+        .status-error {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sistema de Análise de Dados de Varejo</h1>
+            <p>Plataforma Multimodelo para Análise Avançada de Vendas</p>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+            <button class="tab-btn" onclick="switchTab('olap')">Análise OLAP</button>
+            <button class="tab-btn" onclick="switchTab('datamining')">Data Mining</button>
+            <button class="tab-btn" onclick="switchTab('temporal')">Análise Temporal</button>
+            <button class="tab-btn" onclick="switchTab('integration')">Integração</button>
+        </div>
+        
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="dashboard-grid">
+                <div class="kpi-card">
+                    <h3>Vendas Totais</h3>
+                    <div class="value" id="totalSales">R$ 2.847.320</div>
+                    <div class="change">↗ +12.5% vs mês anterior</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Produtos Vendidos</h3>
+                    <div class="value" id="totalProducts">15.432</div>
+                    <div class="change">↗ +8.3% vs mês anterior</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Clientes Ativos</h3>
+                    <div class="value" id="activeCustomers">3.892</div>
+                    <div class="change">↗ +15.2% vs mês anterior</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Margem Média</h3>
+                    <div class="value" id="avgMargin">23.8%</div>
+                    <div class="change">↗ +2.1% vs mês anterior</div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Vendas por Categoria (Últimos 6 Meses)</h3>
+                <canvas id="salesChart" width="400" height="200"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Tendência de Vendas por Loja</h3>
+                <canvas id="storeChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+        
+        <!-- OLAP Tab -->
+        <div id="olap" class="tab-content">
+            <h2>Análise OLAP - Consultas Multidimensionais</h2>
+            
+            <div class="form-group">
+                <label>Dimensão Tempo:</label>
+                <select id="timeDimension">
+                    <option value="month">Por Mês</option>
+                    <option value="quarter">Por Trimestre</option>
+                    <option value="year">Por Ano</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Dimensão Localização:</label>
+                <select id="locationDimension">
+                    <option value="all">Todas as Lojas</option>
+                    <option value="store1">Loja Centro</option>
+                    <option value="store2">Loja Shopping</option>
+                    <option value="store3">Loja Norte</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Dimensão Categoria:</label>
+                <select id="categoryDimension">
+                    <option value="all">Todas as Categorias</option>
+                    <option value="electronics">Eletrônicos</option>
+                    <option value="clothing">Roupas</option>
+                    <option value="books">Livros</option>
+                    <option value="home">Casa e Decoração</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="executeOLAP()">Executar Análise OLAP</button>
+            
+            <div id="olapResults" class="analysis-results" style="display: none;">
+                <h4>Resultados da Análise OLAP</h4>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Período</th>
+                            <th>Localização</th>
+                            <th>Categoria</th>
+                            <th>Vendas (R$)</th>
+                            <th>Quantidade</th>
+                            <th>Margem (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="olapTableBody">
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Análise OLAP - Drill Down</h3>
+                <canvas id="olapChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+        
+        <!-- Data Mining Tab -->
+        <div id="datamining" class="tab-content">
+            <h2>Data Mining - Análises Avançadas</h2>
+            
+            <div class="mining-card">
+                <h4>Clustering de Clientes</h4>
+                <p>Segmentação automática de clientes baseada em comportamento de compra</p>
+                <button class="btn" onclick="runCustomerClustering()">Executar Clustering</button>
+                
+                <div id="clusteringResults" style="display: none; margin-top: 20px;">
+                    <h5>Segmentos Identificados:</h5>
+                    <div class="cluster-item">
+                        <strong>Cluster 1 - Compradores Frequentes (35%)</strong><br>
+                        Compram regularmente, ticket médio R$ 120, preferem eletrônicos
+                    </div>
+                    <div class="cluster-item">
+                        <strong>Cluster 2 - Compradores Ocasionais (45%)</strong><br>
+                        Compras esporádicas, ticket médio R$ 85, variedade de categorias
+                    </div>
+                    <div class="cluster-item">
+                        <strong>Cluster 3 - Compradores Premium (20%)</strong><br>
+                        Compras de alto valor, ticket médio R$ 280, produtos de luxo
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mining-card">
+                <h4>Previsão de Vendas</h4>
+                <p>Predição de vendas futuras usando algoritmos de machine learning</p>
+                <button class="btn" onclick="runSalesPrediction()">Gerar Previsão</button>
+                
+                <div id="predictionResults" style="display: none; margin-top: 20px;">
+                    <h5>Previsões para os Próximos 3 Meses:</h5>
+                    <div class="prediction-item">
+                        <strong>Março 2025:</strong> R$ 2.950.000 (±3.5%)
+                    </div>
+                    <div class="prediction-item">
+                        <strong>Abril 2025:</strong> R$ 3.120.000 (±4.2%)
+                    </div>
+                    <div class="prediction-item">
+                        <strong>Maio 2025:</strong> R$ 2.890.000 (±3.8%)
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Análise de Tendências - Data Mining</h3>
+                <canvas id="miningChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+        
+        <!-- Temporal Analysis Tab -->
+        <div id="temporal" class="tab-content">
+            <h2>Análise Temporal - Evolução Histórica</h2>
+            
+            <div class="temporal-controls">
+                <div class="form-group">
+                    <label>Data Inicial:</label>
+                    <input type="date" id="startDate" value="2024-01-01">
+                </div>
+                <div class="form-group">
+                    <label>Data Final:</label>
+                    <input type="date" id="endDate" value="2025-05-25">
+                </div>
+                <div class="form-group">
+                    <label>Métrica:</label>
+                    <select id="temporalMetric">
+                        <option value="sales">Vendas</option>
+                        <option value="price">Preços</option>
+                        <option value="stock">Estoque</option>
+                        <option value="margin">Margem</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="runTemporalAnalysis()">Executar Análise Temporal</button>
+            
+            <div class="chart-container">
+                <h3>Evolução Temporal de Métricas</h3>
+                <canvas id="temporalChart" width="400" height="200"></canvas>
+            </div>
+            
+            <div class="data-section">
+                <h3>Análise de Sazonalidade</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Período</th>
+                            <th>Vendas Médias</th>
+                            <th>Variação (%)</th>
+                            <th>Tendência</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Q1 (Jan-Mar)</td>
+                            <td>R$ 2.650.000</td>
+                            <td>-8.5%</td>
+                            <td>Baixa temporada</td>
+                        </tr>
+                        <tr>
+                            <td>Q2 (Abr-Jun)</td>
+                            <td>R$ 2.890.000</td>
+                            <td>+12.3%</td>
+                            <td>Crescimento</td>
+                        </tr>
+                        <tr>
+                            <td>Q3 (Jul-Set)</td>
+                            <td>R$ 3.120.000</td>
+                            <td>+18.7%</td>
+                            <td>Alta temporada</td>
+                        </tr>
+                        <tr>
+                            <td>Q4 (Out-Dez)</td>
+                            <td>R$ 3.450.000</td>
+                            <td>+25.2%</td>
+                            <td>Pico de vendas</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Integration Tab -->
+        <div id="integration" class="tab-content">
+            <h2>Integração de Bancos de Dados</h2>
+            
+            <div class="integration-status">
+                <div class="status-item status-connected">
+                    <h4>ObjectDB</h4>
+                    <p>✓ Conectado</p>
+                    <small>Modelo Objeto-Relacional</small>
+                </div>
+                <div class="status-item status-connected">
+                    <h4>Data Warehouse</h4>
+                    <p>✓ Conectado</p>
+                    <small>Esquema Estrela</small>
+                </div>
+                <div class="status-item status-connected">
+                    <h4>MongoDB</h4>
+                    <p>✓ Conectado</p>
+                    <small>Dados Não Estruturados</small>
+                </div>
+            </div>
+            
+            <div class="data-section">
+                <h3>API de Integração - Endpoints Disponíveis</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Endpoint</th>
+                            <th>Método</th>
+                            <th>Descrição</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>/api/products</td>
+                            <td>GET</td>
+                            <td>Lista produtos do ObjectDB</td>
+                            <td>✓ Ativo</td>
+                        </tr>
+                        <tr>
+                            <td>/api/sales/history</td>
+                            <td>GET</td>
+                            <td>Histórico do Data Warehouse</td>
+                            <td>✓ Ativo</td>
+                        </tr>
+                        <tr>
+                            <td>/api/reviews</td>
+                            <td>GET</td>
+                            <td>Comentários do MongoDB</td>
+                            <td>✓ Ativo</td>
+                        </tr>
+                        <tr>
+                            <td>/api/analytics/olap</td>
+                            <td>POST</td>
+                            <td>Consultas OLAP integradas</td>
+                            <td>✓ Ativo</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mining-card">
+                <h4>Sincronização de Dados</h4>
+                <p>Status da sincronização entre os diferentes bancos de dados</p>
+                <div style="margin-top: 15px;">
+                    <div style="background: #e8f5e8; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                        <strong>ObjectDB → Data Warehouse:</strong> Última sincronização há 2 minutos
+                    </div>
+                    <div style="background: #e8f5e8; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                        <strong>MongoDB → Sistema Principal:</strong> Última sincronização há 5 minutos
+                    </div>
+                    <div style="background: #e8f5e8; padding: 10px; border-radius: 5px;">
+                        <strong>Cache Temporal:</strong> Atualizado automaticamente a cada hora
+                    </div>
+                </div>
+                <button class="btn" onclick="forceSyncData()">Forçar Sincronização</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais para armazenar dados
+        let salesData = {
+            categories: ['Eletrônicos', 'Roupas', 'Livros', 'Casa e Decoração', 'Esportes'],
+            monthlySales: [450000, 520000, 380000, 290000, 340000, 480000],
+            stores: ['Loja Centro', 'Loja Shopping', 'Loja Norte'],
+            storeSales: [
+                [150000, 180000, 140000, 160000, 170000, 190000],
+                [200000, 230000, 180000, 190000, 210000, 220000],
+                [100000, 110000, 90000, 95000, 105000, 120000]
+            ]
+        };
+        
+        let charts = {};
+        
+        // Função para alternar entre abas
+        function switchTab(tabName) {
+            // Ocultar todas as abas
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remover classe active de todos os botões
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostrar aba selecionada
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Inicializar gráficos se necessário
+            setTimeout(() => {
+                if (tabName === 'dashboard') {
+                    initDashboardCharts();
+                } else if (tabName === 'olap') {
+                    initOLAPChart();
+                } else if (tabName === 'datamining') {
+                    initMiningChart();
+                } else if (tabName === 'temporal') {
+                    initTemporalChart();
+                }
+            }, 100);
+        }
+        
+        // Inicializar gráficos do dashboard
+        function initDashboardCharts() {
+            // Gráfico de vendas por categoria
+            const salesCtx = document.getElementById('salesChart');
+            if (salesCtx && !charts.salesChart) {
+                charts.salesChart = new Chart(salesCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                        datasets: [{
+                            label: 'Vendas Totais',
+                            data: salesData.monthlySales,
+                            borderColor: 'rgb(102, 126, 234)',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return 'R$ ' + (value/1000) + 'k';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Gráfico de vendas por loja
+            const storeCtx = document.getElementById('storeChart');
+            if (storeCtx && !charts.storeChart) {
+                charts.storeChart = new Chart(storeCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                        datasets: salesData.stores.map((store, index) => ({
+                            label: store,
+                            data: salesData.storeSales[index],
+                            backgroundColor: `rgba(${102 + index * 30}, ${126 + index * 20}, ${234 - index * 20}, 0.8)`,
+                            borderColor: `rgba(${102 + index * 30}, ${126 + index * 20}, ${234 - index * 20}, 1)`,
+                            borderWidth: 1
+                        }))
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stacked: false,
+                                ticks: {
+                                    callback: function(value) {
+                                        return 'R$ ' + (value/1000) + 'k';
+                                    }
+                                }
+                            },
+                            x: {
+                                stacked: false
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Executar análise OLAP
+        function executeOLAP() {
+            const time = document.getElementById('timeDimension').value;
+            const location = document.getElementById('locationDimension').value;
+            const category = document.getElementById('categoryDimension').value;
+            
+            // Simular dados OLAP
+            const olapData = [
+                ['2025-01', 'Loja Centro', 'Eletrônicos', 'R$ 45.000', '120', '22.5%'],
+                ['2025-01', 'Loja Shopping', 'Roupas', 'R$ 38.000', '95', '28.3%'],
+                ['2025-01', 'Loja Norte', 'Livros', 'R$ 12.000', '80', '35.2%'],
+                ['2025-02', 'Loja Centro', 'Casa e Decoração', 'R$ 52.000', '65', '19.8%'],
+                ['2025-02', 'Loja Shopping', 'Eletrônicos', 'R$ 67.000', '145', '25.1%']
+            ];
+            
+            const tbody = document.getElementById('olapTableBody');
+            tbody.innerHTML = '';
+            
+            olapData.forEach(row => {
+                const tr = document.createElement('tr');
+                row.forEach(cell => {
+                    const td = document.createElement('td');
+                    td.textContent = cell;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+            
+            document.getElementById('olapResults').style.display = 'block';
+            
+            // Atualizar gráfico OLAP
+            updateOLAPChart(olapData);
+        }
+        
+        // Inicializar gráfico OLAP
+        function initOLAPChart() {
+            const ctx = document.getElementById('olapChart');
+            if (ctx && !charts.olapChart) {
+                charts.olapChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Eletrônicos', 'Roupas', 'Livros', 'Casa e Decoração'],
+                        datasets: [{
+                            data: [45000, 38000, 12000, 52000],
+                            backgroundColor: [
+                                'rgba(102, 126, 234, 0.8)',
+                                'rgba(118, 75, 162, 0.8)',
+                                'rgba(255, 99, 132, 0.8)',
+                                'rgba(54, 162, 235, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgba(102, 126, 234, 1)',
+                                'rgba(118, 75, 162, 1)',
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Atualizar gráfico OLAP
+        function updateOLAPChart(data) {
+            if (charts.olapChart) {
+                // Processar dados para o gráfico
+                const categories = {};
+                data.forEach(row => {
+                    const category = row[2];
+                    const sales = parseInt(row[3].replace(/[R$.,\s]/g, ''));
+                    categories[category] = (categories[category] || 0) + sales;
+                });
+                
+                charts.olapChart.data.labels = Object.keys(categories);
+                charts.olapChart.data.datasets[0].data = Object.values(categories);
+                charts.olapChart.update();
+            }
+        }
+        
+        // Executar clustering de clientes
+        function runCustomerClustering() {
+            document.getElementById('clusteringResults').style.display = 'block';
+            
+            // Simular processamento
+            const btn = event.target;
+            btn.textContent = 'Processando...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.textContent = 'Executar Clustering';
+                btn.disabled = false;
+            }, 2000);
+        }
+        
+        // Executar previsão de vendas
+        function runSalesPrediction() {
+            document.getElementById('predictionResults').style.display = 'block';
+            
+            // Simular processamento
+            const btn = event.target;
+            btn.textContent = 'Processando...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.textContent = 'Gerar Previsão';
+                btn.disabled = false;
+            }, 2000);
+        }
+        
+        // Inicializar gráfico de data mining
+        function initMiningChart() {
+            const ctx = document.getElementById('miningChart');
+            if (ctx && !charts.miningChart) {
+                charts.miningChart = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Cluster 1 - Frequentes',
+                            data: [
+                                {x: 120, y: 15},
+                                {x: 135, y: 18},
+                                {x: 110, y: 12},
+                                {x: 145, y: 20}
+                            ],
+                            backgroundColor: 'rgba(168, 237, 234, 0.8)',
+                            borderColor: 'rgba(168, 237, 234, 1)'
+                        }, {
+                            label: 'Cluster 2 - Ocasionais',
+                            data: [
+                                {x: 85, y: 3},
+                                {x: 90, y: 4},
+                                {x: 75, y: 2},
+                                {x: 95, y: 5}
+                            ],
+                            backgroundColor: 'rgba(254, 214, 227, 0.8)',
+                            borderColor: 'rgba(254, 214, 227, 1)'
+                        }, {
+                            label: 'Cluster 3 - Premium',
+                            data: [
+                                {x: 280, y: 8},
+                                {x: 320, y: 10},
+                                {x: 250, y: 6},
+                                {x: 350, y: 12}
+                            ],
+                            backgroundColor: 'rgba(255, 236, 210, 0.8)',
+                            borderColor: 'rgba(255, 236, 210, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Ticket Médio (R$)'
+                                }
+                            },
+                            y: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Frequência de Compras/Mês'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Executar análise temporal
+        function runTemporalAnalysis() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const metric = document.getElementById('temporalMetric').value;
+            
+            // Simular análise temporal
+            updateTemporalChart(metric);
+        }
+        
+        // Inicializar gráfico temporal
+        function initTemporalChart() {
+            const ctx = document.getElementById('temporalChart');
+            if (ctx && !charts.temporalChart) {
+                charts.temporalChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan 2024', 'Fev 2024', 'Mar 2024', 'Abr 2024', 'Mai 2024', 'Jun 2024', 'Jul 2024', 'Ago 2024', 'Set 2024', 'Out 2024', 'Nov 2024', 'Dez 2024', 'Jan 2025', 'Fev 2025', 'Mar 2025', 'Abr 2025', 'Mai 2025'],
+                        datasets: [{
+                            label: 'Vendas (R$)',
+                            data: [2650000, 2580000, 2720000, 2890000, 2950000, 3120000, 3280000, 3150000, 3350000, 3450000, 3650000, 3850000, 2850000, 2920000, 3080000, 3150000, 2847320],
+                            borderColor: 'rgb(102, 126, 234)',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                ticks: {
+                                    callback: function(value) {
+                                        return 'R$ ' + (value/1000000).toFixed(1) + 'M';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Atualizar gráfico temporal
+        function updateTemporalChart(metric) {
+            if (charts.temporalChart) {
+                let data, label, color;
+                
+                switch(metric) {
+                    case 'sales':
+                        data = [2650000, 2580000, 2720000, 2890000, 2950000, 3120000, 3280000, 3150000, 3350000, 3450000, 3650000, 3850000, 2850000, 2920000, 3080000, 3150000, 2847320];
+                        label = 'Vendas (R$)';
+                        color = 'rgb(102, 126, 234)';
+                        break;
+                    case 'price':
+                        data = [45.20, 46.10, 44.80, 47.30, 48.50, 49.20, 51.10, 50.80, 52.30, 53.70, 54.20, 55.80, 47.90, 48.60, 49.80, 50.20, 51.30];
+                        label = 'Preço Médio (R$)';
+                        color = 'rgb(255, 99, 132)';
+                        break;
+                    case 'stock':
+                        data = [15420, 14890, 16200, 15800, 16500, 17200, 16800, 17500, 16900, 15600, 14200, 13800, 16800, 17200, 16500, 15900, 15432];
+                        label = 'Estoque Médio';
+                        color = 'rgb(54, 162, 235)';
+                        break;
+                    case 'margin':
+                        data = [21.5, 22.1, 20.8, 23.2, 24.1, 23.8, 25.2, 24.9, 25.8, 26.2, 25.9, 26.8, 22.8, 23.4, 24.1, 23.9, 23.8];
+                        label = 'Margem (%)';
+                        color = 'rgb(75, 192, 192)';
+                        break;
+                }
+                
+                charts.temporalChart.data.datasets[0].data = data;
+                charts.temporalChart.data.datasets[0].label = label;
+                charts.temporalChart.data.datasets[0].borderColor = color;
+                charts.temporalChart.data.datasets[0].backgroundColor = color.replace('rgb', 'rgba').replace(')', ', 0.1)');
+                charts.temporalChart.update();
+            }
+        }
+        
+        // Forçar sincronização de dados
+        function forceSyncData() {
+            const btn = event.target;
+            btn.textContent = 'Sincronizando...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.textContent = 'Forçar Sincronização';
+                btn.disabled = false;
+                alert('Sincronização concluída com sucesso!');
+            }, 3000);
+        }
+        
+        // Inicializar aplicação
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar gráficos do dashboard
+            setTimeout(() => {
+                initDashboardCharts();
+            }, 500);
+            
+            // Simular atualização de KPIs em tempo real
+            setInterval(() => {
+                updateKPIs();
+            }, 30000); // Atualizar a cada 30 segundos
+        });
+        
+        // Atualizar KPIs dinamicamente
+        function updateKPIs() {
+            const totalSales = document.getElementById('totalSales');
+            const totalProducts = document.getElementById('totalProducts');
+            const activeCustomers = document.getElementById('activeCustomers');
+            const avgMargin = document.getElementById('avgMargin');
+            
+            // Simular pequenas variações nos valores
+            const salesVariation = (Math.random() - 0.5) * 50000;
+            const productsVariation = Math.floor((Math.random() - 0.5) * 200);
+            const customersVariation = Math.floor((Math.random() - 0.5) * 100);
+            const marginVariation = (Math.random() - 0.5) * 2;
+            
+            const currentSales = 2847320 + salesVariation;
+            const currentProducts = 15432 + productsVariation;
+            const currentCustomers = 3892 + customersVariation;
+            const currentMargin = 23.8 + marginVariation;
+            
+            if (totalSales) totalSales.textContent = 'R$ ' + currentSales.toLocaleString('pt-BR');
+            if (totalProducts) totalProducts.textContent = currentProducts.toLocaleString('pt-BR');
+            if (activeCustomers) activeCustomers.textContent = currentCustomers.toLocaleString('pt-BR');
+            if (avgMargin) avgMargin.textContent = currentMargin.toFixed(1) + '%';
+        }
+        
+        // Adicionar efeitos de hover nos cards KPI
+        document.addEventListener('DOMContentLoaded', function() {
+            const kpiCards = document.querySelectorAll('.kpi-card');
+            kpiCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+        
+        // Implementar funcionalidade de busca/filtro
+        function filterData(searchTerm) {
+            // Implementar lógica de filtro nos dados
+            console.log('Filtrando dados por:', searchTerm);
+        }
+        
+        // Exportar dados para diferentes formatos
+        function exportData(format) {
+            switch(format) {
+                case 'csv':
+                    exportToCSV();
+                    break;
+                case 'excel':
+                    exportToExcel();
+                    break;
+                case 'pdf':
+                    exportToPDF();
+                    break;
+            }
+        }
+        
+        function exportToCSV() {
+            // Implementar exportação para CSV
+            console.log('Exportando para CSV...');
+        }
+        
+        function exportToExcel() {
+            // Implementar exportação para Excel
+            console.log('Exportando para Excel...');
+        }
+        
+        function exportToPDF() {
+            // Implementar exportação para PDF
+            console.log('Exportando para PDF...');
+        }
+        
+        // Implementar notificações em tempo real
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: linear-gradient(45deg, #667eea, #764ba2);
+                color: white;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
+        // Adicionar estilos para animações
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            
+            .notification {
+                font-weight: 500;
+                cursor: pointer;
+                transition: transform 0.2s ease;
+            }
+            
+            .notification:hover {
+                transform: scale(1.05);
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Simular notificações periódicas
+        setInterval(() => {
+            const messages = [
+                'Nova venda registrada: R$ 1.250,00',
+                'Estoque baixo: Produto XYZ-123',
+                'Meta mensal atingida em 87%',
+                'Novo cliente cadastrado'
+            ];
+            
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            if (Math.random() < 0.3) { // 30% de chance
+                showNotification(randomMessage);
+            }
+        }, 45000); // A cada 45 segundos
+    </script>
+</body>
+</html>
