@@ -1,0 +1,45 @@
+{
+    "comentarios_filmes": [
+      {
+        "id_comentario": "c1",
+        "id_filme": "1",
+        "cliente": "João Silva",
+        "comentario": "Matrix é incrível!",
+        "nota": 5,
+        "data": "2024-05-01"
+      },
+      {
+        "id_comentario": "c2",
+        "id_filme": "2",
+        "cliente": "Ana Costa",
+        "comentario": "Obra prima, imperdível.",
+        "nota": 4.8,
+        "data": "2024-05-02"
+      }
+    ],
+    "filmes": [
+      {
+        "id": "1",
+        "titulo": "Matrix",
+        "genero": "Ficção Científica",
+        "diretor": "Lana Wachowski",
+        "atores": ["Keanu Reeves", "Laurence Fishburne", "Carrie-Anne Moss"],
+        "classificacao": "14",
+        "duracao": 136,
+        "ano": 1999,
+        "formatos": ["DVD", "Blu-ray", "Digital"]
+      },
+      {
+        "id": "2",
+        "titulo": "O Poderoso Chefão",
+        "genero": "Drama",
+        "diretor": "Francis Ford Coppola",
+        "atores": ["Marlon Brando", "Al Pacino", "James Caan"],
+        "classificacao": "16",
+        "duracao": 175,
+        "ano": 1972,
+        "formatos": ["DVD", "Digital"]
+      }
+    ]
+  }
+  
